@@ -17,4 +17,9 @@ public class ExamenRepositoryOtro implements ExamenRepository{
         }
         return List.of();
     }
+
+    @Override
+    public Examen guardar(Examen examen) {
+        return null;
+    }
 }
