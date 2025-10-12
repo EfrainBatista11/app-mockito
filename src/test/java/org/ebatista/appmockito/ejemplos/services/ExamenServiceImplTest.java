@@ -7,7 +7,9 @@ import org.ebatista.appmockito.ejemplos.repositories.PreguntaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -36,13 +38,15 @@ class ExamenServiceImplTest {
     @InjectMocks
     ExamenServiceImpl service;
 
+    @Captor
+    ArgumentCaptor<Long> captor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-//        repository = mock(ExamenRepository.class);
-//        preguntaRepository = mock(PreguntaRepository.class);
-//        service = new ExamenServiceImpl(repository, preguntaRepository);
+        // repository = mock(ExamenRepository.class);
+        // preguntaRepository = mock(PreguntaRepository.class);
+        // service = new ExamenServiceImpl(repository, preguntaRepository);
     }
 
     @Test
@@ -127,7 +131,7 @@ class ExamenServiceImplTest {
         assertEquals(8L, examen.getId());
         assertEquals("Física", examen.getNombre());
         // Verificar la invocación del repositorio
-        verify(repository).guardar(any( Examen.class));
+        verify(repository).guardar(any(Examen.class));
         verify(preguntaRepository).guardarVarias(anyList());
     }
 
@@ -158,12 +162,28 @@ class ExamenServiceImplTest {
     void testArgumentMatchers2() {
         when(repository.findAll()).thenReturn(Datos.EXAMENES_ID_NEGATIVOS);
         when(preguntaRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
-        service.findExamenPorNombreConPreguntas("Matemáticas");
+        service.findExamenPorNombreConPreguntas("Lenguaje");
+
+        // Verificamos que el id del examen sea un valor positivo
 
         verify(repository).findAll();
         verify(preguntaRepository).findPreguntasPorExamenId(argThat(new MiArgsMatchers()));
     }
 
+    @Test
+    void testArgumentMatchers3() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES_ID_NEGATIVOS);
+        when(preguntaRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+        service.findExamenPorNombreConPreguntas("Lenguaje");
+
+        // Verificamos que el id del examen sea un valor positivo
+
+        verify(repository).findAll();
+        // Esta solo valida, pero no muestra un mensaje personalizado
+        verify(preguntaRepository).findPreguntasPorExamenId(argThat((argument) -> argument != null && argument > 0));
+    }
+
+    // Clase anidada para crear un ArgumentMatcher personalizado
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
 
         private Long argument;
@@ -174,11 +194,27 @@ class ExamenServiceImplTest {
             return argument != null && argument > 0;
         }
 
+        // Mensaje personalizado de error
         @Override
         public String toString() {
-            return "Es para un mensaje personalizado de error " +
+            return "MENSAJE: Es para un mensaje personalizado de error " +
                     "que imprime mockito en caso de que falle el test " +
+                    argument + " " +
                     "debe ser un entero positivo";
         }
     }
+
+    @Test
+    void testArgumentCaptor() {
+        when(repository.findAll()).thenReturn(Datos.EXAMENES);
+        // when(preguntaRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
+        service.findExamenPorNombreConPreguntas("Matemáticas");
+
+        // Comentamos la siguiente línea porque usamos @Captor
+        // ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
+        verify(preguntaRepository).findPreguntasPorExamenId(captor.capture());
+
+        assertEquals(5L, captor.getValue());
+    }
+
 }
