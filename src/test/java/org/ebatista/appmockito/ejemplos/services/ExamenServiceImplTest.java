@@ -2,7 +2,6 @@ package org.ebatista.appmockito.ejemplos.services;
 
 import org.ebatista.appmockito.ejemplos.models.Examen;
 import org.ebatista.appmockito.ejemplos.repositories.ExamenRepository;
-import org.ebatista.appmockito.ejemplos.repositories.ExamenRepositoryOtro;
 import org.ebatista.appmockito.ejemplos.repositories.PreguntaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +42,7 @@ class ExamenServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
         // repository = mock(ExamenRepository.class);
         // preguntaRepository = mock(PreguntaRepository.class);
         // service = new ExamenServiceImpl(repository, preguntaRepository);
@@ -164,7 +163,7 @@ class ExamenServiceImplTest {
         when(preguntaRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
         service.findExamenPorNombreConPreguntas("Lenguaje");
 
-        // Verificamos que el id del examen sea un valor positivo
+        // Verificamos que id del examen sea un valor positivo
 
         verify(repository).findAll();
         verify(preguntaRepository).findPreguntasPorExamenId(argThat(new MiArgsMatchers()));
@@ -176,10 +175,10 @@ class ExamenServiceImplTest {
         when(preguntaRepository.findPreguntasPorExamenId(anyLong())).thenReturn(Datos.PREGUNTAS);
         service.findExamenPorNombreConPreguntas("Lenguaje");
 
-        // Verificamos que el id del examen sea un valor positivo
+        // Verificamos que id del examen sea un valor positivo
 
         verify(repository).findAll();
-        // Esta solo valida, pero no muestra un mensaje personalizado
+        // Está válida, pero no muestra un mensaje personalizado
         verify(preguntaRepository).findPreguntasPorExamenId(argThat((argument) -> argument != null && argument > 0));
     }
 
@@ -217,4 +216,14 @@ class ExamenServiceImplTest {
         assertEquals(5L, captor.getValue());
     }
 
+    @Test
+    void testDoThrow() {
+        Examen examen = Datos.EXAMEN;
+        examen.setPreguntas(Datos.PREGUNTAS);
+        doThrow(IllegalArgumentException.class).when(preguntaRepository).guardarVarias(anyList());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.guardar(examen);
+        });
+    }
 }
