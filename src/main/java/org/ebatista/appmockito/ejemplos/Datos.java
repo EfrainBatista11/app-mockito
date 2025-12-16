@@ -1,4 +1,4 @@
-package org.ebatista.appmockito.ejemplos.services;
+package org.ebatista.appmockito.ejemplos;
 
 import org.ebatista.appmockito.ejemplos.models.Examen;
 import java.util.Arrays;

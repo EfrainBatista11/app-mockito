@@ -46,6 +46,7 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -56,10 +57,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <useModulePath>false</useModulePath>
+                    <!-- Use java 21, pasa bien, y este para silenciar mensaje de la máquina virtual -->
                     <argLine>
                         -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-                        <!-- opcional: silencia el warning de class sharing -->
                         -Xshare:off
                     </argLine>
                 </configuration>
